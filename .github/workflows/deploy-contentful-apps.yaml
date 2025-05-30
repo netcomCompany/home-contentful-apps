@@ -44,6 +44,6 @@ jobs:
         uses: contentful/actions-app-deploy@v1
         with:
           organization-id: ${{ secrets.ORGANIZATION_ID }}
-          app-definition-id: ${{ steps.set-app.outputs.app_definition_id }}
+          definition-id: ${{ steps.set-app.outputs.app_definition_id }}
           access-token: ${{ secrets.ACCESS_TOKEN }}
           folder: ./${{ github.event.inputs.app_folder }}/dist
