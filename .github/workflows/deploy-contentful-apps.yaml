@@ -1,46 +1,37 @@
-name: Deploy Contentful App (Sidebar Cachepurge Button)
+name: Deploy Contentful App
 
 on:
   workflow_dispatch:
+    inputs:
+      app_folder:
+        description: 'Which app folder to deploy (e.g., sidebar-cachepurge-button)'
+        required: true
+        default: 'sidebar-cachepurge-button'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      APP_FOLDER: sidebar-cachepurge-button
-      APP_DEFINITION_ID_DEV: ${{ secrets.APP_DEFINITION_ID_DEV_SIDEBAR_CACHEPURGE_BUTTON }}
-      APP_DEFINITION_ID_PROD: ${{ secrets.APP_DEFINITION_ID_PROD_SIDEBAR_CACHEPURGE_BUTTON }}
-
     steps:
       - uses: actions/checkout@v3
 
-      - name: Use Node.js
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
 
       - name: Install dependencies
         run: npm ci
-        working-directory: ./${{ env.APP_FOLDER }}
+        working-directory: ./${{ github.event.inputs.app_folder }}
 
       - name: Build app
         run: npm run build
-        working-directory: ./${{ env.APP_FOLDER }}
-
-      - name: Set App Definition ID
-        id: set-app
-        run: |
-          if [[ "${GITHUB_REF##*/}" == "develop" ]]; then
-            echo "app_definition_id=${{ env.APP_DEFINITION_ID_PROD }}" >> $GITHUB_OUTPUT
-          else
-            echo "app_definition_id=${{ env.APP_DEFINITION_ID_DEV }}" >> $GITHUB_OUTPUT
-          fi
+        working-directory: ./${{ github.event.inputs.app_folder }}
 
       - name: Deploy to Contentful
         uses: contentful/actions-app-deploy@v1
         with:
           organization-id: ${{ secrets.ORGANIZATION_ID }}
-          app-definition-id: ${{ steps.set-app.outputs.app_definition_id }}
+          app-definition-id: ${{ secrets.APP_DEFINITION_ID }}
           access-token: ${{ secrets.ACCESS_TOKEN }}
-          folder: ./${{ env.APP_FOLDER }}/build
+          folder: ./${{ github.event.inputs.app_folder }}/dist
