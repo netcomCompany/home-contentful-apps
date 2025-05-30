@@ -1,0 +1,36 @@
+name: Deploy Contentful App
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_folder:
+        description: 'Which app folder to deploy'
+        required: true
+        default: 'sidebar-cachepurge-button'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./${{ github.event.inputs.app_folder }}
+
+      - name: Build app
+        run: npm run build
+        working-directory: ./${{ github.event.inputs.app_folder }}
+
+      - name: Deploy to Contentful
+        uses: contentful/actions-app-deploy@v1
+        with:
+          organization-id: ${{ secrets.ORGANIZATION_ID }}
+          app-definition-id: ${{ secrets[format('APP_DEFINITION_ID_{0}', github.event.inputs.app_folder)] }}
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+          folder: ./${{ github.event.inputs.app_folder }}/build

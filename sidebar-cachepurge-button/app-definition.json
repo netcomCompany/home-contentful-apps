@@ -1,0 +1,11 @@
+{
+    "name": "Sidebar-Cachepurge-Button",
+    "locations": [
+        {
+        "location": "entry-sidebar"
+        },
+        {
+        "location": "dialog"
+        }
+    ]
+}
