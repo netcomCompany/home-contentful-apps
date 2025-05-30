@@ -4,21 +4,35 @@ on:
   workflow_dispatch:
     inputs:
       app_folder:
-        description: 'Which app folder to deploy (e.g., sidebar-cachepurge-button)'
+        description: 'Which app folder to deploy'
         required: true
         default: 'sidebar-cachepurge-button'
+        type: choice
+        options:
+          - sidebar-cachepurge-button
+          - sidebar-release-trigger-button
+          - sidebar-stats-panel
+
+      env_target:
+        description: 'Which Contentful environment to deploy to'
+        required: true
+        default: 'master'
+        type: choice
+        options:
+          - master
+          - develop
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 16.x
 
       - name: Install dependencies
         run: npm ci
@@ -34,9 +48,10 @@ jobs:
           echo "🔧 Determining app definition ID..."
 
           app_folder="${{ github.event.inputs.app_folder }}"
-          app_folder_env="${app_folder//-/_}"  # ハイフンをアンダースコアに置換
+          app_folder_env="${app_folder//-/_}"
+          env_target="${{ github.event.inputs.env_target }}"
 
-          if [[ "${GITHUB_REF##*/}" == "develop" ]]; then
+          if [[ "$env_target" == "master" ]]; then
             key="APP_DEFINITION_ID_PROD_${app_folder_env}"
           else
             key="APP_DEFINITION_ID_DEV_${app_folder_env}"
@@ -45,12 +60,14 @@ jobs:
           echo "Resolved secret key: $key"
 
           app_definition_id="${!key}"
-
           echo "app_definition_id=$app_definition_id" >> $GITHUB_OUTPUT
         env:
-          # ハイフンを _ に置き換えたキー名に注意
           APP_DEFINITION_ID_PROD_sidebar_cachepurge_button: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar_cachepurge_button }}
           APP_DEFINITION_ID_DEV_sidebar_cachepurge_button: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_cachepurge_button }}
+          APP_DEFINITION_ID_PROD_sidebar_release_trigger_button: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar_release_trigger_button }}
+          APP_DEFINITION_ID_DEV_sidebar_release_trigger_button: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_release_trigger_button }}
+          APP_DEFINITION_ID_PROD_sidebar_stats_panel: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar_stats_panel }}
+          APP_DEFINITION_ID_DEV_sidebar_stats_panel: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_stats_panel }}
 
       - name: Deploy to Contentful
         uses: contentful/actions-app-deploy@v1
