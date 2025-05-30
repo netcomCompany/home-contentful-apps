@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 18.x
 
       - name: Install dependencies
         run: npm ci
@@ -32,13 +32,19 @@ jobs:
         id: set-app
         run: |
           echo "🔧 Determining app definition ID..."
-          if [[ "${GITHUB_REF##*/}" == "develop" ]]; then
-            echo "Using PROD app definition ID"
-            echo "app_definition_id=${{ secrets[format('APP_DEFINITION_ID_PROD_%s', github.event.inputs.app_folder)] }}" >> $GITHUB_OUTPUT
+          branch="${GITHUB_REF##*/}"
+          if [[ "$branch" == "develop" ]]; then
+            key="APP_DEFINITION_ID_PROD_${{ github.event.inputs.app_folder }}"
           else
-            echo "Using DEV app definition ID"
-            echo "app_definition_id=${{ secrets[format('APP_DEFINITION_ID_DEV_%s', github.event.inputs.app_folder)] }}" >> $GITHUB_OUTPUT
+            key="APP_DEFINITION_ID_DEV_${{ github.event.inputs.app_folder }}"
           fi
+          echo "Resolved secret key: $key"
+          app_definition_id="${!key}"
+          echo "app_definition_id=$app_definition_id" >> $GITHUB_OUTPUT
+        env:
+          # 必要な app_folder ごとに列挙。今は sidebar-cachepurge-button のみ
+          APP_DEFINITION_ID_PROD_sidebar-cachepurge-button: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar-cachepurge-button }}
+          APP_DEFINITION_ID_DEV_sidebar-cachepurge-button: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar-cachepurge-button }}
 
       - name: Deploy to Contentful
         uses: contentful/actions-app-deploy@v1
