@@ -32,19 +32,25 @@ jobs:
         id: set-app
         run: |
           echo "🔧 Determining app definition ID..."
-          branch="${GITHUB_REF##*/}"
-          if [[ "$branch" == "develop" ]]; then
-            key="APP_DEFINITION_ID_PROD_${{ github.event.inputs.app_folder }}"
+
+          app_folder="${{ github.event.inputs.app_folder }}"
+          app_folder_env="${app_folder//-/_}"  # ハイフンをアンダースコアに置換
+
+          if [[ "${GITHUB_REF##*/}" == "develop" ]]; then
+            key="APP_DEFINITION_ID_PROD_${app_folder_env}"
           else
-            key="APP_DEFINITION_ID_DEV_${{ github.event.inputs.app_folder }}"
+            key="APP_DEFINITION_ID_DEV_${app_folder_env}"
           fi
+
           echo "Resolved secret key: $key"
+
           app_definition_id="${!key}"
+
           echo "app_definition_id=$app_definition_id" >> $GITHUB_OUTPUT
         env:
-          # 必要な app_folder ごとに列挙。今は sidebar-cachepurge-button のみ
-          APP_DEFINITION_ID_PROD_sidebar-cachepurge-button: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar-cachepurge-button }}
-          APP_DEFINITION_ID_DEV_sidebar-cachepurge-button: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar-cachepurge-button }}
+          # ハイフンを _ に置き換えたキー名に注意
+          APP_DEFINITION_ID_PROD_sidebar_cachepurge_button: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar_cachepurge_button }}
+          APP_DEFINITION_ID_DEV_sidebar_cachepurge_button: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_cachepurge_button }}
 
       - name: Deploy to Contentful
         uses: contentful/actions-app-deploy@v1
