@@ -10,15 +10,22 @@ on:
         required: true
         type: string
     secrets:
-      required:
-        - ACCESS_TOKEN
-        - ORGANIZATION_ID
-        - APP_DEFINITION_ID_PRD_sidebar_cachepurge_button
-        - APP_DEFINITION_ID_DEV_sidebar_cachepurge_button
-        - APP_DEFINITION_ID_PRD_sidebar_release_trigger_button
-        - APP_DEFINITION_ID_DEV_sidebar_release_trigger_button
-        - APP_DEFINITION_ID_PRD_sidebar_stats_panel
-        - APP_DEFINITION_ID_DEV_sidebar_stats_panel
+      ACCESS_TOKEN:
+        required: true
+      ORGANIZATION_ID:
+        required: true
+      APP_DEFINITION_ID_PRD_sidebar_cachepurge_button:
+        required: false
+      APP_DEFINITION_ID_DEV_sidebar_cachepurge_button:
+        required: false
+      APP_DEFINITION_ID_PRD_sidebar_release_trigger_button:
+        required: false
+      APP_DEFINITION_ID_DEV_sidebar_release_trigger_button:
+        required: false
+      APP_DEFINITION_ID_PRD_sidebar_stats_panel:
+        required: false
+      APP_DEFINITION_ID_DEV_sidebar_stats_panel:
+        required: false
 
 jobs:
   deploy:
