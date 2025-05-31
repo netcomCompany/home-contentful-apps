@@ -36,6 +36,7 @@ jobs:
           else
             echo "This workflow is restricted to 'main' branch only. Exiting."
             echo "proceed=false" >> $GITHUB_OUTPUT
+            exit 1
           fi
 
   deploy:

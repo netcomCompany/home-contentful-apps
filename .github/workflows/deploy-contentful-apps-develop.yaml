@@ -31,11 +31,12 @@ jobs:
         id: verify
         run: |
           echo "Current branch: ${{ github.ref_name }}"
-          if [[ "${{ github.ref_name }}" == develop || "${{ github.ref_name }}" == feature/* ]]; then
+          if [[ "${{ github.ref_name }}" == "develop" ]] || [[ "${{ github.ref_name }}" =~ ^feature/ ]]; then
             echo "proceed=true" >> $GITHUB_OUTPUT
           else
             echo "This workflow is restricted to 'develop' and 'feature/*' branches. Exiting."
             echo "proceed=false" >> $GITHUB_OUTPUT
+            exit 1
           fi
 
   deploy:
