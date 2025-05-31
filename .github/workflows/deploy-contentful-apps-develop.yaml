@@ -1,4 +1,4 @@
-name: Deploy Contentful App For develop Environment
+name: Develop Env - Deploy Contentful Apps
 
 on:
   workflow_dispatch:
@@ -12,8 +12,9 @@ on:
           - sidebar-cachepurge-button
           - sidebar-release-trigger-button
           - sidebar-stats-panel
+
       env_target:
-        description: 'Environment'
+        description: 'Which Contentful environment to deploy to'
         required: true
         default: 'develop'
         type: choice
@@ -21,12 +22,27 @@ on:
           - develop
 
 jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    outputs:
+      proceed: ${{ steps.verify.outputs.proceed }}
+    steps:
+      - name: Verify branch
+        id: verify
+        run: |
+          echo "Current branch: ${{ github.ref_name }}"
+          if [[ "${{ github.ref_name }}" == develop || "${{ github.ref_name }}" == feature/* ]]; then
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          else
+            echo "This workflow is restricted to 'develop' and 'feature/*' branches. Exiting."
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          fi
+
   deploy:
-    if: |
-      startsWith(github.ref, 'refs/heads/develop') ||
-      startsWith(github.ref, 'refs/heads/feature/')
+    needs: check-branch
+    if: needs.check-branch.outputs.proceed == 'true'
     uses: ./.github/workflows/deploy-contentful-apps-common.yaml
     with:
-      app_folder: ${{ inputs.app_folder }}
-      env_target: ${{ inputs.env_target }}
+      app_folder: ${{ github.event.inputs.app_folder }}
+      env_target: ${{ github.event.inputs.env_target }}
     secrets: inherit
