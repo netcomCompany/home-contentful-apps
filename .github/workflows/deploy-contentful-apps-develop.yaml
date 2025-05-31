@@ -1,4 +1,4 @@
-name: Deploy Contentful App (develop/feature branches)
+name: Deploy Contentful App For develop Environment
 
 on:
   workflow_dispatch:

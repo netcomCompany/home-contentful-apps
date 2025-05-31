@@ -1,4 +1,4 @@
-name: Deploy Contentful App (main branch only)
+name: Deploy Contentful App For master or develop Environment (main branch only)
 
 on:
   workflow_dispatch:
