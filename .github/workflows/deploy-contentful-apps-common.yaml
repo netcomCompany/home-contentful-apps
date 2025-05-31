@@ -1,31 +1,35 @@
-name: Deploy Contentful App
+name: Common Deploy Workflow for Contentful Apps
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       app_folder:
-        description: 'Which app folder to deploy'
         required: true
-        default: 'sidebar-cachepurge-button'
-        type: choice
-        options:
-          - sidebar-cachepurge-button
-          - sidebar-release-trigger-button
-          - sidebar-stats-panel
-
+        type: string
       env_target:
-        description: 'Which Contentful environment to deploy to'
         required: true
-        default: 'master'
-        type: choice
-        options:
-          - master
-          - develop
+        type: string
+    secrets:
+      ACCESS_TOKEN:
+        required: true
+      ORGANIZATION_ID:
+        required: true
+      APP_DEFINITION_ID_PRD_sidebar_cachepurge_button:
+        required: false
+      APP_DEFINITION_ID_DEV_sidebar_cachepurge_button:
+        required: false
+      APP_DEFINITION_ID_PRD_sidebar_release_trigger_button:
+        required: false
+      APP_DEFINITION_ID_DEV_sidebar_release_trigger_button:
+        required: false
+      APP_DEFINITION_ID_PRD_sidebar_stats_panel:
+        required: false
+      APP_DEFINITION_ID_DEV_sidebar_stats_panel:
+        required: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
@@ -36,23 +40,21 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: ./${{ github.event.inputs.app_folder }}
+        working-directory: ./${{ inputs.app_folder }}
 
       - name: Build app
         run: npm run build
-        working-directory: ./${{ github.event.inputs.app_folder }}
+        working-directory: ./${{ inputs.app_folder }}
 
       - name: Set App Definition ID
         id: set-app
         run: |
-          echo "🔧 Determining app definition ID..."
-
-          app_folder="${{ github.event.inputs.app_folder }}"
+          app_folder="${{ inputs.app_folder }}"
           app_folder_env="${app_folder//-/_}"
-          env_target="${{ github.event.inputs.env_target }}"
+          env_target="${{ inputs.env_target }}"
 
           if [[ "$env_target" == "master" ]]; then
-            key="APP_DEFINITION_ID_PROD_${app_folder_env}"
+            key="APP_DEFINITION_ID_PRD_${app_folder_env}"
           else
             key="APP_DEFINITION_ID_DEV_${app_folder_env}"
           fi
@@ -62,11 +64,11 @@ jobs:
           app_definition_id="${!key}"
           echo "app_definition_id=$app_definition_id" >> $GITHUB_OUTPUT
         env:
-          APP_DEFINITION_ID_PROD_sidebar_cachepurge_button: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar_cachepurge_button }}
+          APP_DEFINITION_ID_PRD_sidebar_cachepurge_button: ${{ secrets.APP_DEFINITION_ID_PRD_sidebar_cachepurge_button }}
           APP_DEFINITION_ID_DEV_sidebar_cachepurge_button: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_cachepurge_button }}
-          APP_DEFINITION_ID_PROD_sidebar_release_trigger_button: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar_release_trigger_button }}
+          APP_DEFINITION_ID_PRD_sidebar_release_trigger_button: ${{ secrets.APP_DEFINITION_ID_PRD_sidebar_release_trigger_button }}
           APP_DEFINITION_ID_DEV_sidebar_release_trigger_button: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_release_trigger_button }}
-          APP_DEFINITION_ID_PROD_sidebar_stats_panel: ${{ secrets.APP_DEFINITION_ID_PROD_sidebar_stats_panel }}
+          APP_DEFINITION_ID_PRD_sidebar_stats_panel: ${{ secrets.APP_DEFINITION_ID_PRD_sidebar_stats_panel }}
           APP_DEFINITION_ID_DEV_sidebar_stats_panel: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_stats_panel }}
 
       - name: Deploy to Contentful
@@ -75,4 +77,4 @@ jobs:
           organization-id: ${{ secrets.ORGANIZATION_ID }}
           app-definition-id: ${{ steps.set-app.outputs.app_definition_id }}
           access-token: ${{ secrets.ACCESS_TOKEN }}
-          folder: ./${{ github.event.inputs.app_folder }}/dist
+          folder: ./${{ inputs.app_folder }}/dist
