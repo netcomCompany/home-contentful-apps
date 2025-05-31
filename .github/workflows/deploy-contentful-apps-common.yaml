@@ -30,6 +30,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -49,6 +50,8 @@ jobs:
       - name: Set App Definition ID
         id: set-app
         run: |
+          echo "Determining app definition ID"
+
           app_folder="${{ inputs.app_folder }}"
           app_folder_env="${app_folder//-/_}"
           env_target="${{ inputs.env_target }}"
