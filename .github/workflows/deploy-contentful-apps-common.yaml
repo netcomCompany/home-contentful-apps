@@ -10,26 +10,20 @@ on:
         required: true
         type: string
     secrets:
-      ACCESS_TOKEN:
-        required: true
-      ORGANIZATION_ID:
-        required: true
-      APP_DEFINITION_ID_PRD_sidebar_cachepurge_button:
-        required: false
-      APP_DEFINITION_ID_DEV_sidebar_cachepurge_button:
-        required: false
-      APP_DEFINITION_ID_PRD_sidebar_release_trigger_button:
-        required: false
-      APP_DEFINITION_ID_DEV_sidebar_release_trigger_button:
-        required: false
-      APP_DEFINITION_ID_PRD_sidebar_stats_panel:
-        required: false
-      APP_DEFINITION_ID_DEV_sidebar_stats_panel:
-        required: false
+      required:
+        - ACCESS_TOKEN
+        - ORGANIZATION_ID
+        - APP_DEFINITION_ID_PRD_sidebar_cachepurge_button
+        - APP_DEFINITION_ID_DEV_sidebar_cachepurge_button
+        - APP_DEFINITION_ID_PRD_sidebar_release_trigger_button
+        - APP_DEFINITION_ID_DEV_sidebar_release_trigger_button
+        - APP_DEFINITION_ID_PRD_sidebar_stats_panel
+        - APP_DEFINITION_ID_DEV_sidebar_stats_panel
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -49,6 +43,8 @@ jobs:
       - name: Set App Definition ID
         id: set-app
         run: |
+          echo "Determining app definition ID"
+
           app_folder="${{ inputs.app_folder }}"
           app_folder_env="${app_folder//-/_}"
           env_target="${{ inputs.env_target }}"
