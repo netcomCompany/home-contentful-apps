@@ -15,7 +15,7 @@ const Sidebar = () => {
   // Get the current value from the blog post field and store it in React state
   const [blogText, setBlogText] = useState(contentField.getValue());
 
-  return <Paragraph>Hello Sidebar Component</Paragraph>;
+  return <Paragraph>Hello Sidebar ComponentAAAAAAA</Paragraph>;
 };
 
 export default Sidebar;
