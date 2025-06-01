@@ -26,6 +26,10 @@ on:
         required: false
       APP_DEFINITION_ID_DEV_sidebar_stats_panel:
         required: false
+      APP_DEFINITION_ID_PRD_my_first_app:
+        required: false
+      APP_DEFINITION_ID_DEV_my_first_app:
+        required: false
 
 jobs:
   deploy:
@@ -73,6 +77,8 @@ jobs:
           APP_DEFINITION_ID_DEV_sidebar_release_trigger_button: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_release_trigger_button }}
           APP_DEFINITION_ID_PRD_sidebar_stats_panel: ${{ secrets.APP_DEFINITION_ID_PRD_sidebar_stats_panel }}
           APP_DEFINITION_ID_DEV_sidebar_stats_panel: ${{ secrets.APP_DEFINITION_ID_DEV_sidebar_stats_panel }}
+          APP_DEFINITION_ID_PRD_my_first_app: ${{ secrets.APP_DEFINITION_ID_PRD_my_first_app }}
+          APP_DEFINITION_ID_DEV_my_first_app: ${{ secrets.APP_DEFINITION_ID_DEV_my_first_app }}
 
       - name: Deploy to Contentful
         uses: contentful/actions-app-deploy@v1
