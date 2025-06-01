@@ -10,6 +10,7 @@ on:
         type: choice
         options:
           - sidebar-cachepurge-button
+          - my-first-app
           - sidebar-release-trigger-button
           - sidebar-stats-panel
 

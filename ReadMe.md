@@ -1,5 +1,32 @@
 # Miroku-Contentful-AppsのGit運用 / Contentful環境へのデプロイ手順
 
+## 0.Contentful Appsの初期化(新規フォルダを追加して開発を始めるとき)
+
+- ローカルでアプリを初期化＆実装して起動できることを確認
+- ここでAppId(APP_DEFINITION_ID)が発行されるので、GitHubのSecret Keyにも登録する
+- Develop用、Master用でアプリの定義を分けて作成すること
+- 手順は公式を参照
+<<https://www.contentful.com/developers/docs/extensibility/app-framework/tutorial/>>
+``` sh
+# アプリの初期化("my-first-app"の部分は任意のアプリ名)
+npx create-contentful-app my-first-app
+  > Do you want to start with a blank template or use one of our examples?
+    -> Template
+  > Pick a template (Use arrow keys)
+    -> React + Vite
+
+# ローカルで起動できることを確認
+# localhost:3000でアプリがホストされるので、Contentfulにログインしてカスタムアプリの定義を作成する
+cd my-first-app
+npm run start
+```
+
+- ビルドした資産(dist配下一式)をContentful Appsにアップロードする<br>
+  (一度ローカルからアップロードしておかないとGitからデプロイできないため)
+``` sh
+npm run build
+```
+
 ## 1.Git運用
 - feature/[チケット番号] ・・・ 開発用ブランチ。改修後にプッシュしてContentful Apps(develop用)にdeploy-contentful-apps-develop.yamlでデプロイする。<br>
 テストまで完了したらdevelopブランチへPRする。<br>
@@ -23,7 +50,7 @@ APP_DEFINITION_ID_PRD_sidebar_cachepurge_button
 APP_DEFINITION_ID_DEV_sidebar_cachepurge_button
 
 ### シークレットキーの登録
-- Settings > Actions > Repository secretsで「New repository secret」を押下し、<br>
+- Settings > Secrets and variables > Actions > Repository secretsで「New repository secret」を押下し、<br>
   対象のContentful AppsのAppId(APP_DEFINITION_ID)を設定する。<br>
 （例）<br>
 develop環境用： APP_DEFINITION_ID_DEV_XXXX <br>
@@ -64,3 +91,10 @@ Contentful master環境用アプリへのデプロイ　※ masterブランチ�
 （例）<br>
 deploy-contentful-apps-main.yamlのワークフローディスパッチを使ってdevelopブランチからデプロイはできない。
 
+
+
+### Secret Key
+- ACCESS_TOKEN
+- ORGANIZATION_ID
+- APP_DEFINITION_ID_DEV_SIDEBAR_CACHEPURGE_BUTTON
+- APP_DEFINITION_ID_PRD_SIDEBAR_CACHEPURGE_BUTTON
